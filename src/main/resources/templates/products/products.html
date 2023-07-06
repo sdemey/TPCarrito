@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Productos </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+</head>
+<body>
+<div th:insert="include/navbar :: nav"></div>
+<h1>Lista de productos : <span th:text="${nombreMunicipio}"></span></h1>
+<div class="mt-3">
+    <a th:href="@{/}" class="btn btn-success " role="button"> volver al inicio</a>
+    <a th:href="productsCreate" class="btn btn-success " role="button"> Añadir producto</a>
+    <a th:href="pedidos" class="btn btn-success " role="button"> Ver pedidos</a>
+    <a th:href="carrito" class="btn btn-success " role="button"> Ver Carrito</a>
+</div>
+<form th:action="@{/productsSelect}" method="get" class="mt-2">
+    <label for="selectProvincia"> Provincia </label>
+    <select name="selectProvincia" id ="selectProvincia" required>
+        <tr th:each ="provincia : ${listaProvincia}">
+            <option th:text="${provincia.nombre}" th:value="${provincia.id_provincia}"></option>
+        </tr>
+    </select>
+    <label for="selectMuni"> Municipio </label>
+    <select name="selectMuni" id="selectMuni" required></select>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function(){
+        $("#selectProvincia").click(function(){
+            var provinciaId = $(this).val();
+            $.ajax({
+                type: "GET",
+                url: "/RodriguezManuelMiAli/encontrarMunicipios",
+                data: { provinciaId: provinciaId },
+                success: function(municipios) {
+                    $("#selectMuni").empty();
+                    $.each(municipios, function(index, municipio) {
+                        $("#selectMuni").append(`<option value="${municipio.id_municipio}">${municipio.nombre}</option>`);
+                    });
+                }
+            });
+        });
+    });
+    </script>
+    <input type="submit" value="buscar">
+</form>
+<table class="table mt-3">
+    <tbody>
+    <tr>
+        <th class="lead">Nombre</th>
+        <th class="lead">Precio</th>
+        <th class="lead">Stock</th>
+    </tr>
+    <tr th:each ="producto : ${products}">
+        <td th:text="${producto.product_name}" class="lead"></td><!-- si pongo p me saca de la tabla-->
+        <td th:text="${producto.product_price}" class="lead"></td>
+        <td th:text="${producto.product_stock}" class="lead"></td>
+        <td><img th:src="'imagenes/' + ${producto.product_picture}"/>
+        <td><a th:href="@{/productsEdit/{id}(id=${producto.product_id})}" class="btn btn-success " role="button"> Editar</a></td>
+        <td><a th:href="@{/productsDelete/{id}(id=${producto.product_id})}" class="btn btn-success " role="button"> Borrar</a></td>
+        <td><a th:href="@{/annadirCarrito/{id}(id=${producto.product_id})}" class="btn btn-success " role="button"> Añadir al carrito</a></td>
+    </tr>
+    </tbody>
+</table>
+<span th:text="${mensaje}"></span>
+</body>
+</html>

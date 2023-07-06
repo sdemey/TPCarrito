@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="lib/bootstrap/bootstrap.min.css">
+    <script src="lib/bootstrap/bootstrap.min.js"></script>
+</head>
+<body>
+<div th:insert="include/navbar :: nav"></div>
+<h1>Editar producto</h1>
+<form method="post" th:action="@{/producstActualizar/{id}(id=${producto.product_id})}" th:object="${producto}" class="w-75 p-3">
+    <div class="form-group row">
+      <label for="product_name"> Nombre</label>
+      <input th:field="*{product_name}" type="text" id="product_name" required>
+    </div>
+    <div class="form-group row">
+      <label for="product_price"> Precio</label>
+      <input th:field="*{product_price}" type="text" id="product_price" pattern="[0-9]+([.][0-9]{0,2})?" required>
+    </div>
+    <div class="form-group row">
+        <label for="selectProvincia"> Provincia </label>
+        <select name="selectProvincia" id ="selectProvincia" required>
+            <tr th:each ="provincia : ${listaProvincia}">
+                <option th:text="${provincia.nombre}" th:value="${provincia.id_provincia}"></option>
+            </tr>
+        </select>
+        <label for="selectMuni"> Municipio </label>
+        <select name="selectMuni" id="selectMuni" th:field="*{id_municipio}" required></select>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+          $(document).ready(function(){
+          $("#selectProvincia").click(function(){
+              var provinciaId = $(this).val();
+              $.ajax({
+                  type: "GET",
+                  url: "/RodriguezManuelMiAli/encontrarMunicipios",
+                  data: { provinciaId: provinciaId },
+                  success: function(municipios) {
+                      $("#selectMuni").empty();
+                      $.each(municipios, function(index, municipio) {
+                          $("#selectMuni").append(`<option value="${municipio.id_municipio}">${municipio.nombre}</option>`);
+                      });
+                  }
+              });
+          });
+      });
+      </script>
+    </div>
+    <div class="form-group row">
+      <label for="product_stock"> Stock</label>
+      <input th:field="*{product_stock}" type="number" id="product_stock" required>
+    </div>
+    <input type="submit" value="Save changes"/>
+</form>
+<!--
+<a href="products"> Volver a la lista de productos</a>
+-->
+<a th:href="@{/products}" class="btn btn-success " role="button"> Volver a la lista de productos</a>
+</body>
+</html>
